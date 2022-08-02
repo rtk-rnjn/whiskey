@@ -30,7 +30,7 @@ class Pages:
         self.entries = entries
         self.message = ctx.message
         self.channel = ctx.channel
-        self.author = author if author else ctx.author
+        self.author = author or ctx.author
         self.thumbnail = thumbnail
         self.embed_author = embed_author
 
@@ -86,9 +86,12 @@ class Pages:
         return self.embed
 
     def prepare_embed(self, entries, page, *, first=False):
-        p = []
-        for index, entry in enumerate(entries, 1 + ((page - 1) * self.per_page)):
-            p.append(f"{entry}")
+        p = [
+            f"{entry}"
+            for index, entry in enumerate(
+                entries, 1 + ((page - 1) * self.per_page)
+            )
+        ]
 
         if self.maximum_pages > 1 and not self.footertext:
             if self.show_entry_count:
@@ -186,10 +189,8 @@ class Pages:
                 to_delete.append(await self.channel.send(f"Invalid page given. ({page}/{self.maximum_pages})"))
                 await asyncio.sleep(5)
 
-        try:
+        with contextlib.suppress(Exception):
             await self.channel.delete_messages(to_delete)
-        except Exception:
-            pass
 
     async def stop_pages(self):
         """stops the interactive pagination session"""

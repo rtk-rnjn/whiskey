@@ -81,7 +81,7 @@ class Whiskey(commands.Bot):
 
             self.persistent_views_added = True
 
-        print(f"Ragnarok is coming...")
+        print("Ragnarok is coming...")
 
     async def close(self):
         await super().close()

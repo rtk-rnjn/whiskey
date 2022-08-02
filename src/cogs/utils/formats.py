@@ -2,7 +2,7 @@ from __future__ import annotations
 
 
 def truncate_string(value: str, max_length: int = 128, suffix: str = "...") -> str:
-    string_value = str(value)
+    string_value = value
     return string_value[:min(len(string_value), (max_length - len(suffix)))] + suffix if len(string_value) > max_length else ""
 
 class TabularData:

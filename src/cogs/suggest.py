@@ -203,7 +203,7 @@ class Suggest(commands.Cog):
             return
 
         if int(msg.embeds[0].footer.text.split(":")[1]) != ctx.author.id:
-            return await ctx.send(f"You don't own that 'suggestion'")
+            return await ctx.send("You don't own that 'suggestion'")
 
         await msg.delete(delay=0)
         await ctx.send("Done", delete_after=5)
@@ -219,12 +219,12 @@ class Suggest(commands.Cog):
             return await ctx.send(
                 f"Can not find message of ID `{messageID}`. Probably already deleted, or `{messageID}` is invalid"
             )
-        
+
         if msg.author.id != self.bot.user.id:
             return await ctx.send(
                 f"Invalid `{messageID}`"
             )
-        
+
         table = TabularData()
 
         upvoter = []
@@ -240,7 +240,7 @@ class Suggest(commands.Cog):
                 downvoter = await reaction.users().flatten()
         upvoter = [str(m) for m in upvoter]
         downvoter = [str(m) for m in downvoter]
-        
+
         table.set_columns(["Upvote", "Downvote"])
         ls = list(zip_longest(upvoter, downvoter, fillvalue=''))
         table.add_rows(ls)
@@ -329,12 +329,12 @@ class Suggest(commands.Cog):
             return await ctx.send(
                 f"Can not find message of ID `{messageID}`. Probably already deleted, or `{messageID}` is invalid"
             )
-        
+
         if msg.author.id != self.bot.user.id:
             return await ctx.send(
                 f"Invalid `{messageID}`"
             )
-        
+
         flag = flag.upper()
         try:
             payload: Dict[str, Union[int, str]] = OTHER_REACTION[flag]
@@ -441,10 +441,7 @@ class Suggest(commands.Cog):
             return True
 
         perms: discord.Permissions = member.guild_permissions
-        if any([perms.administrator, perms.manage_messages]):
-            return True
-
-        return False
+        return any([perms.administrator, perms.manage_messages])
 
 async def setup(bot: Whiskey):
     await bot.add_cog(Suggest(bot))

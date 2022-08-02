@@ -6,7 +6,7 @@ class ArrayField(Field, list):
     def __init__(self, field: Field, **kwargs) -> None:
         super().__init__(**kwargs)
         self.sub_field = field
-        self.SQL_TYPE = "%s[]" % field.SQL_TYPE
+        self.SQL_TYPE = f"{field.SQL_TYPE}[]"
 
     def to_python_value(self, value: Any) -> Any:
         return list(map(self.sub_field.to_python_value, value))

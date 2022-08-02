@@ -58,7 +58,7 @@ class Responses(commands.Cog):
         keywords = await string_input(ctx, check)
 
         keywords = keywords.strip().split(",")
-        keywords = [k.strip() for k in keywords if not len(k) >= 100]
+        keywords = [k.strip() for k in keywords if len(k) < 100]
 
         cmds = [cmd.qualified_name for cmd in self.bot.walk_commands()]
 
@@ -86,10 +86,13 @@ class Responses(commands.Cog):
         """allow/deny everyone to create responses"""
         record = await Response.get(pk=ctx.guild.id)
         await Response.filter(pk=ctx.guild.id).update(allow_all=not record.allow_all)
-        if not record.allow_all:
-            return await ctx.send("Now anyone can create auto-responses")
-
-        return await ctx.send("From now on, people need manage_server permissions to create auto responses")
+        return (
+            await ctx.send(
+                "From now on, people need manage_server permissions to create auto responses"
+            )
+            if record.allow_all
+            else await ctx.send("Now anyone can create auto-responses")
+        )
 
     @commands.command()
     @has_done_setup()
@@ -192,7 +195,7 @@ class Responses(commands.Cog):
     @commands.command()
     @commands.has_permissions(manage_guild=True)
     @has_done_setup()
-    async def redit(self, ctx: commands.Context, response_id: int, option: str = None)-> None:
+    async def redit(self, ctx: commands.Context, response_id: int, option: str = None) -> None:
         """edit a response content or keywords"""
         main_record = await Response.get(pk=ctx.guild.id)
         res = await main_record.data.filter(pk=response_id).first()
@@ -213,14 +216,19 @@ class Responses(commands.Cog):
             keywords = await string_input(ctx, check=check)
 
             keywords = keywords.strip().split(",")
-            keywords = [k.strip() for k in keywords if not len(k) >= 100]
+            keywords = [k.strip() for k in keywords if len(k) < 100]
 
             cmds = [cmd.qualified_name for cmd in self.bot.walk_commands()]
 
             valid_keywords = set()
 
             for keyword in keywords:
-                if not bool(await main_record.data.filter(keywords__icontains=keyword)) and not keyword in cmds:
+                if (
+                    not bool(
+                        await main_record.data.filter(keywords__icontains=keyword)
+                    )
+                    and keyword not in cmds
+                ):
                     if keyword in res.keywords[:]:
                         res.remove(keyword)
                     else:

@@ -29,7 +29,7 @@ def partial_ratio(a: Sequence, b: Sequence) -> int:
         o = SequenceMatcher(None, short, long[start:end])
         r = o.ratio()
 
-        if 100 * r > 99:
+        if r > 99 / 100:
             return 100
         scores.append(r)
 
@@ -113,10 +113,7 @@ def extract_or_exact(
     second = matches[1][1]
 
     # check if the top one is exact or more than 30% more correct than the top
-    if top == 100 or top > (second + 30):
-        return [matches[0]]
-
-    return matches
+    return [matches[0]] if top == 100 or top > (second + 30) else matches
 
 
 def extract_matches(
@@ -146,7 +143,7 @@ def extract_matches(
 
 def finder(text: str, collection: Sequence, *, key=None, lazy=True) -> Union[Generator, List[Any]]:
     suggestions = []
-    text = str(text)
+    text = text
     pat = ".*?".join(map(re.escape, text))
     regex = re.compile(pat, flags=re.IGNORECASE)
     for item in collection:
@@ -156,9 +153,7 @@ def finder(text: str, collection: Sequence, *, key=None, lazy=True) -> Union[Gen
             suggestions.append((len(r.group()), r.start(), item))
 
     def sort_key(tup):
-        if key:
-            return tup[0], tup[1], key(tup[2])
-        return tup
+        return (tup[0], tup[1], key(tup[2])) if key else tup
 
     if lazy:
         return (z for _, _, z in sorted(suggestions, key=sort_key))
